@@ -1,0 +1,32 @@
+<script src="/DNN/js/jquery.mask.min.js" type="text/javascript"></script>
+<script>
+
+
+$( document ).ready(function() {
+$( "form :text" ).filter( ".dnnFormInput" ).slice( 1,2 ).last().prop('readonly', true);
+$( "form :text" ).filter( ".dnnFormInput" ).first().mask('A-00000000-0', {'translation': {
+                                        A: {pattern: /[EVJevj]/}
+                                      }
+                                });
+  $( "form :text" ).filter( ".dnnFormInput" ).first().focusout(function() 
+{
+
+$.ajax({
+  url: "http://localhost/PortalProveedoresMVC/Proveedor/ValidaRIF",
+  data: { RIF: $( "form :text" ).filter( ".dnnFormInput" ).first().val() }
+})
+  .done(function( msg ) {
+   var result = msg .split("|");
+   if(result[0] == "-1")
+   {
+    $( "form :text" ).filter( ".dnnFormInput" ).slice( 1,2 ).last().val("");
+    $( "span" ).filter( ".dnnFormItem span.dnnFormMessage.dnnFormError" ).first().show();
+   }
+   else 
+     $( "form :text" ).filter( ".dnnFormInput" ).slice( 1,2 ).last().val(result[1]);
+  });
+}
+)
+
+})
+</script>

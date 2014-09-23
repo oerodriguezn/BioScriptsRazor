@@ -1,0 +1,105 @@
+@using System.Configuration
+@using System.Data.SqlClient
+@{
+var connectionString = ConfigurationManager.ConnectionStrings["SiteSqlServer"].ConnectionString;
+       var con = new SqlConnection(connectionString);
+       con.Open();
+       var command = new SqlCommand("BioObtenerDetallePago", con);
+       command.CommandType = System.Data.CommandType.StoredProcedure;
+       command.Parameters.Add("@RIF", Request["RIF"]);
+       command.Parameters.Add("@Pago", Request["Pago"]);
+     
+       SqlDataReader myReader = command.ExecuteReader();
+
+       }
+ <!-- DataTables CSS -->
+<link rel="stylesheet" type="text/css" href="~/Content/css/jquery.dataTables.min.css">
+<link rel="stylesheet" type="text/css" href="~/Content/css/dataTables.tableTools.css">
+<!-- DataTables -->
+<script type="text/javascript" charset="utf8" src="~/Scripts/jquery.dataTables.min.js"></script>
+<script type="text/javascript" charset="utf8" src="~/Scripts/DataTables/dataTables.tableTools.js"></script>
+
+<br></br>
+    <table id="Facturas" class="display compact" cellspacing="0" width="100%">
+    <thead>
+       <tr>
+            <th>Pago</th>
+			<th>Orden de pago</th>
+            <th>Fecha Actualización</th>
+			<th>Fecha Emisión</th>
+			<th>Banco</th>
+			<th>Cuenta</th>
+            <th>Total Pago</th>
+			<th>Monto Aprobado</th>
+			<th>Monto No Aprobado</th>
+			<th>Tipo de Pago</th>
+        </tr>
+    </thead>
+
+    <tfoot>
+        <tr>
+           <th>Pago</th>
+			<th>Orden de pago</th>
+            <th>Fecha Actualización</th>
+			<th>Fecha Emisión</th>
+			<th>Banco</th>
+			<th>Cuenta</th>
+            <th>Total Pago</th>
+			<th>Monto Aprobado</th>
+			<th>Monto No Aprobado</th>
+			<th>Tipo de Pago</th>
+        </tr>
+    </tfoot>
+    <tbody>
+        @while (myReader.Read())
+        {
+            <tr>
+            
+                <td align="center">@myReader["Codigo"].ToString()</td>
+				<td align="center">@myReader["OrdenDePago"].ToString()</td>
+                <td align="center">@Convert.ToDateTime(myReader["FechaActualizacion"]).ToString("dd/MM/yyyy")</td>
+				<td align="center">@Convert.ToDateTime(myReader["FechaEmision"]).ToString("dd/MM/yyyy")</td>
+				<td align="center">@myReader["Banco"].ToString()</td>
+				<td align="center">@myReader["Cuenta"].ToString()</td>
+                <td align="right">@Convert.ToDecimal(myReader["TotalPago"]).ToString("N2")</td>
+				<td align="right">@Convert.ToDecimal(myReader["MontoAprobado"]).ToString("N2")</td>
+				<td align="right">@Convert.ToDecimal(myReader["MontoNoAprobado"]).ToString("N2")</td>
+				<td align="center">@myReader["TipoPago"].ToString()</td>
+            </tr>
+        }
+
+    </tbody>
+</table>
+
+    @{
+        con.Close();
+    }
+
+
+    <script>
+
+        $(document).ready(function () {
+
+            $('#Facturas').dataTable(
+
+                {
+                    "dom": 'T<"clear">lfrtip',
+                    "tableTools": {
+                        "sSwfPath": "@Request.ApplicationPath/Scripts/DataTables/copy_csv_xls_pdf.swf"
+                    },
+                     "language": {
+                         "url": "@Request.ApplicationPath/Scripts/DataTables/Spanish.json"
+            }
+                });
+
+
+        });
+    </script>
+
+
+
+
+
+
+
+
